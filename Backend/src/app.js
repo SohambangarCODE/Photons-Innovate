@@ -8,9 +8,14 @@ const userRoutes = require("./routes/user.route");
 
 const app = express()
 
-// app.use(cors())
 app.use(cors({
-  origin: ["https://kenkoo-frontend.onrender.com", "http://localhost:5173"],
+  origin: function (origin, callback) {
+    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) || origin === "https://photons-innovate.onrender.com") {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 

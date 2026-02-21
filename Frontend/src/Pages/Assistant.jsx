@@ -10,13 +10,14 @@ import { useChat } from "../context/ChatContext"; // Import useChat
 // const API_CHAT_URL = "/api/assistant/chat";
 // const API_UPLOAD_URL = "/api/upload";
 
-const API_CHAT_URL = window.location.hostname === "localhost"
-  ? "http://localhost:3000/api/assistant/chat"
-  : "https://kenkoo-backend.onrender.com/api/assistant/chat";
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const API_CHAT_URL = isLocal
+  ? `http://${window.location.hostname}:3000/api/assistant/chat`
+  : "https://photons-innovate.onrender.com/api/assistant/chat";
 
-const API_UPLOAD_URL = window.location.hostname === "localhost"
-  ? "http://localhost:3000/api/assistant/upload"
-  : "https://kenkoo-backend.onrender.com/api/assistant/upload";
+const API_UPLOAD_URL = isLocal
+  ? `http://${window.location.hostname}:3000/api/assistant/upload`
+  : "https://photons-innovate.onrender.com/api/assistant/upload";
 
 
 const Assistant = () => {

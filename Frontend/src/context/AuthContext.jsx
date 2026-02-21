@@ -8,9 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = window.location.hostname === "localhost"
-    ? "http://localhost:3000/api"
-    : "https://kenkoo-backend.onrender.com/api";
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const API_URL = isLocal
+    ? `http://${window.location.hostname}:3000/api`
+    : "https://photons-innovate.onrender.com/api";
 
   useEffect(() => {
     // Check for token in localStorage on mount

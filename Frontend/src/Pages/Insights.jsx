@@ -13,9 +13,10 @@ import {
 import { useAuth } from "../context/AuthContext";
 import Swal from 'sweetalert2';
 
-const API_INSIGHTS_URL = window.location.hostname === "localhost"
-  ? "http://localhost:3000/api/health/insights"
-  : "https://kenkoo-backend.onrender.com/api/health/insights";
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const API_INSIGHTS_URL = isLocal
+  ? `http://${window.location.hostname}:3000/api/health/insights`
+  : "https://photons-innovate.onrender.com/api/health/insights";
 
 const Insights = () => {
   const { user } = useAuth();

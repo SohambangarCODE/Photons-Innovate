@@ -16,13 +16,14 @@ const Records = () => {
   const [selectedType, setSelectedType] = useState(null);
 
   // const API_URL = "https://kenkoo-backend.onrender.com/api/records"; 
-  const API_URL = window.location.hostname === "localhost" 
-    ? "http://localhost:3000/api/records"
-    : "https://kenkoo-backend.onrender.com/api/records";
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const API_URL = isLocal 
+    ? `http://${window.location.hostname}:3000/api/records`
+    : "https://photons-innovate.onrender.com/api/records";
 
-  const UPLOAD_URL = window.location.hostname === "localhost"
-    ? "http://localhost:3000/api/assistant/upload"
-    : "https://kenkoo-backend.onrender.com/api/assistant/upload";
+  const UPLOAD_URL = isLocal
+    ? `http://${window.location.hostname}:3000/api/assistant/upload`
+    : "https://photons-innovate.onrender.com/api/assistant/upload";
 
   const features = [
     {
@@ -298,9 +299,10 @@ const Records = () => {
                                 <div 
                                     key={record._id} 
                                     onClick={() => {
-                                        const fileLink = window.location.hostname === "localhost" 
-                                            ? `http://localhost:3000${record.fileUrl}`
-                                            : `https://kenkoo-backend.onrender.com${record.fileUrl}`;
+                                        const isLinkLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                                        const fileLink = isLinkLocal 
+                                            ? `http://${window.location.hostname}:3000${record.fileUrl}`
+                                            : `https://photons-innovate.onrender.com${record.fileUrl}`;
                                         window.open(fileLink, "_blank");
                                     }}
                                     className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 group cursor-pointer"
