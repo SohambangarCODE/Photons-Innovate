@@ -217,7 +217,7 @@ const Assistant = () => {
                   Kenkoo Assistant
                 </h2>
                 <p className="text-sm sm:text-base text-gray-500 max-w-md leading-relaxed px-2">
-                  Your personal health companion. Ask about your health records, care plan, or upload documents for instant analysis.
+                  Your personal health companion. Ask about your health records, Expert Connect, or upload documents for instant analysis.
                 </p>
                 
                 {/* Simulated capabilities tags */}

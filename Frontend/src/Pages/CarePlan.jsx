@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const doctorsData = [
@@ -263,7 +263,7 @@ const DoctorProfile = ({ doctor, onBack }) => {
           transition={{ delay: 0.2, duration: 0.4 }}
           className="mb-6"
         >
-          <h2 className="text-xl font-bold text-gray-800 mb-1">Select Your Care Plan</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-1">Select Your Expert Connect</h2>
           <p className="text-sm text-gray-500 mb-5">Comprehensive healthcare management</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -345,7 +345,7 @@ const DoctorProfile = ({ doctor, onBack }) => {
                 <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
                   <i className="ri-shield-check-fill text-blue-600 text-sm"></i>
                 </div>
-                <h3 className="font-bold text-blue-700 text-lg">Kenkoo Care Plan</h3>
+                <h3 className="font-bold text-blue-700 text-lg">Kenkoo Expert Connect</h3>
               </div>
 
               <div className="flex items-baseline gap-1 mb-1">
@@ -416,14 +416,68 @@ const DoctorProfile = ({ doctor, onBack }) => {
 const CarePlan = () => {
   const [search, setSearch] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [recommendedDoctor, setRecommendedDoctor] = useState(null);
+
+  const categories = ["All", "Medicine", "Gynecology", "Cardiologist"];
+
+  useEffect(() => {
+    // Determine recommendation based on user insights
+    const determineRecommendation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const API_INSIGHTS_URL = window.location.hostname === "localhost"
+          ? "http://localhost:3000/api/health/insights"
+          : "https://kenkoo-backend.onrender.com/api/health/insights";
+
+        const res = await fetch(API_INSIGHTS_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          let recommendedDept = null;
+
+          // Check summary metrics for abnormalities
+          if (data?.summary?.metrics) {
+             const metrics = data.summary.metrics;
+             
+             // Simple naive rules for demonstration based on common keywords
+             if (metrics.some(m => m.name.toLowerCase().includes("heart") || m.name.toLowerCase().includes("cholesterol") || m.status.toLowerCase().includes("high"))) {
+                 recommendedDept = "Cardiologist";
+             } else if (metrics.some(m => m.name.toLowerCase().includes("sugar") || m.name.toLowerCase().includes("glucose") || m.name.toLowerCase().includes("blood"))) {
+                 recommendedDept = "Medicine";
+             }
+          }
+          
+          if (recommendedDept) {
+             const doc = doctorsData.find(d => d.shortSpec.includes(recommendedDept) || d.department.includes(recommendedDept) || d.specialization.includes(recommendedDept));
+             if (doc) setRecommendedDoctor(doc);
+          } else {
+             // Default recommendation for testing if no specific insights guide us, but they have records
+             setRecommendedDoctor(doctorsData[0]); 
+          }
+        }
+      } catch (err) {
+        console.error("Failed to determine recommendation:", err);
+      }
+    };
+    determineRecommendation();
+  }, []);
 
   const filteredDoctors = doctorsData.filter((doc) => {
     const q = search.toLowerCase();
-    return (
-      doc.name.toLowerCase().includes(q) ||
-      doc.specialization.toLowerCase().includes(q) ||
-      doc.department.toLowerCase().includes(q)
-    );
+    const matchesSearch = doc.name.toLowerCase().includes(q) ||
+                          doc.specialization.toLowerCase().includes(q) ||
+                          doc.department.toLowerCase().includes(q);
+    
+    const matchesCategory = selectedCategory === "All" || 
+                            doc.department.includes(selectedCategory) || 
+                            doc.shortSpec.includes(selectedCategory);
+    
+    return matchesSearch && matchesCategory;
   });
 
   const cardVariants = {
@@ -473,7 +527,7 @@ const CarePlan = () => {
                     </div>
                     <span className="font-bold text-lg tracking-wide">Kenkoo</span>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">Kenkoo Care Plan</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">Kenkoo Expert Connect</h1>
                   <p className="text-blue-100 text-sm sm:text-base opacity-90 max-w-md">
                     Quality healthcare guidance, all in one place.
                   </p>
@@ -496,10 +550,91 @@ const CarePlan = () => {
               />
             </div>
 
-            {/* ─── Available Doctors ─── */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Available Doctors</h2>
+            {/* ─── AI Recommendation Section ─── */}
+            {recommendedDoctor && search === "" && selectedCategory === "All" && (
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                      <i className="ri-bard-fill text-blue-600 text-xl"></i>
+                      <h2 className="text-xl font-bold text-gray-800">Recommended for You</h2>
+                  </div>
+                  <motion.div
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4 }}
+                      className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl p-1 shadow-sm relative overflow-hidden"
+                  >
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+                      
+                      <div className="bg-white rounded-2xl p-4 sm:p-5 relative z-10">
+                        <div className="flex gap-3 sm:gap-4">
+                          {/* Avatar */}
+                          <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${recommendedDoctor.gradient} flex items-center justify-center shrink-0 shadow-md`}>
+                            <span className="text-white font-bold text-lg sm:text-xl">{recommendedDoctor.initials}</span>
+                          </div>
 
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">{recommendedDoctor.name}</h3>
+                                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                  <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">
+                                    <i className="ri-sparkling-fill text-blue-500"></i>
+                                    Top Match
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-xs sm:text-sm text-gray-500 mt-2 line-clamp-2">
+                              Based on your recent insights and health profile, {recommendedDoctor.name} is the best specialist for your current needs.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Rating + Fee row */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-sm">
+                              <i className="ri-star-fill text-yellow-400"></i>
+                              <span className="font-bold text-gray-800">{recommendedDoctor.rating}</span>
+                              <span className="text-gray-400 text-xs">({recommendedDoctor.ratingCount})</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setSelectedDoctor(recommendedDoctor)}
+                            className="px-4 py-1.5 sm:px-5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all duration-200 active:scale-95 flex items-center gap-1.5"
+                          >
+                            View Profile <i className="ri-arrow-right-line"></i>
+                          </button>
+                        </div>
+                      </div>
+                  </motion.div>
+                </div>
+            )}
+
+            {/* ─── Available Doctors Header & Categories ─── */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+              <h2 className="text-xl font-bold text-gray-800">Available Doctors</h2>
+              
+              <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
+                  {categories.map((cat) => (
+                      <button
+                          key={cat}
+                          onClick={() => setSelectedCategory(cat)}
+                          className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
+                              selectedCategory === cat 
+                              ? "bg-blue-900 text-white shadow-md shadow-blue-900/10" 
+                              : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                          }`}
+                      >
+                          {cat}
+                      </button>
+                  ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
               <div className="space-y-4">
                 {filteredDoctors.length > 0 ? (
                   filteredDoctors.map((doc, index) => (
@@ -574,12 +709,12 @@ const CarePlan = () => {
                           </div>
 
                           <div className="flex flex-col items-end gap-2">
-                            <span className="text-xl sm:text-2xl font-bold text-gray-800">₹{doc.fee}</span>
+                            {/* <span className="text-xl sm:text-2xl font-bold text-gray-800">₹{doc.fee}</span> */}
                             <button
                               onClick={() => setSelectedDoctor(doc)}
                               className="px-4 py-1.5 sm:px-5 sm:py-2 bg-white border-2 border-blue-600 text-blue-600 text-xs sm:text-sm font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-200 active:scale-95"
                             >
-                              View Profile
+                              Connect to Experts
                             </button>
                           </div>
                         </div>
@@ -600,7 +735,7 @@ const CarePlan = () => {
 
             {/* ─── Why Kenkoo Care Plan? ─── */}
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Why Kenkoo Care Plan?</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Why Kenkoo Expert Connect</h2>
 
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {features.map((feature, index) => (
