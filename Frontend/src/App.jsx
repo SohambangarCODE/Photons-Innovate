@@ -8,7 +8,8 @@ import Insights from "./Pages/Insights";
 import CarePlan from "./Pages/CarePlan";
 import ContactPage from "./Pages/ContactPage";
 import Profile from "./Pages/Profile";
-import Assistant from "./Pages/Assistant";
+import HomePage from "./Pages/HomePage";
+import FloatingAssistant from "./Components/FloatingAssistant";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import { AuthProvider } from "./context/AuthContext";
@@ -21,9 +22,10 @@ const App = () => {
       <div className="flex flex-col h-full">
         <Navbar />
 
+        <FloatingAssistant />
         <div className="flex-1 overflow-y-auto relative bg-gray-50/50">
           <Routes>
-            <Route path="/" element={<Assistant />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/Records" element={<Records />} />
             <Route path="/Insights" element={<Insights />} />
             <Route path="/careplan" element={<CarePlan />} />

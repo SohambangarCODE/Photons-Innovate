@@ -161,7 +161,7 @@ function Navbar() {
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              Assistant
+              Home
               <div className="nav-underline absolute bottom-0 left-0 h-0.5 w-full  transform transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"></div>
             </NavLink>
             <NavLink
@@ -248,7 +248,7 @@ function Navbar() {
               end
               onClick={handleLinkClick}
             >
-              Assistant
+              Home
             </NavLink>
             <NavLink
               to="/Records"
