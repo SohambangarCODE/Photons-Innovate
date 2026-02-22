@@ -185,6 +185,16 @@ function Navbar() {
               <div className="nav-underline absolute bottom-0 left-0 h-0.5 w-full  transform transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
             </NavLink>
             <NavLink
+              to="/community"
+              className={linkClass}
+              style={navItemStyle}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              Community
+              <div className="nav-underline absolute bottom-0 left-0 h-0.5 w-full  transform transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+            </NavLink>
+            <NavLink
               to="/careplan"
               className={linkClass}
               style={navItemStyle}
@@ -263,6 +273,13 @@ function Navbar() {
               onClick={handleLinkClick}
             >
               Insights
+            </NavLink>
+            <NavLink
+              to="/community"
+              className="px-4 py-3 text-gray-700 hover:bg-gray-100 hover:text-[#05395e] font-medium transition-all duration-300 hover:pl-6 hover:shadow-inner"
+              onClick={handleLinkClick}
+            >
+              Community
             </NavLink>
             <NavLink
               to="/careplan"

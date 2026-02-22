@@ -12,6 +12,7 @@ import HomePage from "./Pages/HomePage";
 import FloatingAssistant from "./Components/FloatingAssistant";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
+import Community from "./Pages/Community";
 import { AuthProvider } from "./context/AuthContext";
 import { ChatProvider } from "./context/ChatContext";
 
@@ -28,6 +29,7 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/Records" element={<Records />} />
             <Route path="/Insights" element={<Insights />} />
+            <Route path="/community" element={<Community />} />
             <Route path="/careplan" element={<CarePlan />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/profile" element={<Profile />} />
