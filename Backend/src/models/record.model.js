@@ -35,6 +35,14 @@ const RecordSchema = new mongoose.Schema({
   fileType: {
     type: String, // e.g. "pdf", "jpg"
   },
+  fileData: {
+    type: String, // Base64 encoded file data
+    required: false,
+  },
+  fileMimeType: {
+    type: String,
+    required: false,
+  },
   analysis: {
     type: Object, // Store the AI analysis result here
   },

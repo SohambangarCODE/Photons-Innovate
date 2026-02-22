@@ -38,6 +38,15 @@ const uploadFile = async (req, res) => {
         };
     }
 
+    // ✅ Read file and convert to Base64 for persistence on Render
+    let fileBase64 = null;
+    try {
+        const fileBuffer = fs.readFileSync(filePath);
+        fileBase64 = fileBuffer.toString('base64');
+    } catch (fsErr) {
+        console.error("File Read Failed:", fsErr);
+    }
+
     // Create a new record in the database
     const newRecord = new Record({
       user: req.user._id, // Assumes protect middleware is used
@@ -48,6 +57,8 @@ const uploadFile = async (req, res) => {
       fileUrl: `/uploads/${req.file.filename}`, 
       fileName: req.file.originalname,
       fileType: req.file.mimetype ? req.file.mimetype.split('/')[1] : "pdf", 
+      fileData: fileBase64,
+      fileMimeType: req.file.mimetype,
       analysis: analysis,
       metrics: analysis.metrics || [],
       recommendations: analysis.recommendations || [],
@@ -56,7 +67,12 @@ const uploadFile = async (req, res) => {
 
     await newRecord.save();
 
-    // fs.unlinkSync(filePath); // WE KEEP THE FILE NOW for valid access via URL
+    // Clean up local file after saving to DB to save space/be tidy
+    try {
+        fs.unlinkSync(filePath); 
+    } catch (unlinkErr) {
+        console.error("Cleanup failed:", unlinkErr);
+    }
 
     res.json({
       success: true,

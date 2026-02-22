@@ -38,7 +38,41 @@ const deleteRecord = async (req, res) => {
   }
 };
 
+// @desc    View a record file
+// @route   GET /api/records/:id/view
+// @access  Private
+const viewFile = async (req, res) => {
+  try {
+    const record = await Record.findById(req.params.id);
+
+    if (!record) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    // Check user
+    if (record.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "User not authorized" });
+    }
+
+    if (!record.fileData) {
+      return res.status(404).json({ message: "File content missing from database" });
+    }
+
+    // Convert Base64 back to buffer
+    const fileBuffer = Buffer.from(record.fileData, 'base64');
+
+    // Set content type and send
+    res.set('Content-Type', record.fileMimeType || 'application/pdf');
+    res.send(fileBuffer);
+
+  } catch (error) {
+    console.error("Error viewing file:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   getRecords,
   deleteRecord,
+  viewFile,
 };

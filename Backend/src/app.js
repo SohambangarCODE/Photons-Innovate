@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 app.use(express.json())
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.get("/", (req, res) => {
   res.send("Kenkoo Backend is Live 🚀");

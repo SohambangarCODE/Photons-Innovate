@@ -136,6 +136,42 @@ const Records = () => {
     }
   };
 
+  const handleViewFile = async (record) => {
+    try {
+      const token = localStorage.getItem("token");
+      const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const baseUrl = isLocal 
+        ? `http://${window.location.hostname}:3000/api/records`
+        : "https://photons-innovate.onrender.com/api/records";
+      
+      const res = await fetch(`${baseUrl}/${record._id}/view`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        // Fallback for old files that don't have fileData in DB yet
+        const fileLink = isLocal 
+          ? `http://${window.location.hostname}:3000${record.fileUrl}`
+          : `https://photons-innovate.onrender.com${record.fileUrl}`;
+        window.open(fileLink, "_blank");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+
+      // Optional: Cleanup URL after some time
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+    } catch (err) {
+      console.error("View error:", err);
+      Swal.fire('Error', 'Failed to open file', 'error');
+    }
+  };
+
   const handleDelete = async (id, e) => {
     e.stopPropagation(); // Prevent opening the file when clicking delete
 
@@ -298,13 +334,7 @@ const Records = () => {
                             {groupedRecords[year].map((record) => (
                                 <div 
                                     key={record._id} 
-                                    onClick={() => {
-                                        const isLinkLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-                                        const fileLink = isLinkLocal 
-                                            ? `http://${window.location.hostname}:3000${record.fileUrl}`
-                                            : `https://photons-innovate.onrender.com${record.fileUrl}`;
-                                        window.open(fileLink, "_blank");
-                                    }}
+                                    onClick={() => handleViewFile(record)}
                                     className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 group cursor-pointer"
                                 >
                                     {/* Icon */}
